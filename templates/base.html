@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaCave - Gestion de cave à vin</title>
+    <!-- Ligne indispensable pour charger le CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h2>MaCave</h2>
+        {% if session.get('user_id') %}
+            <nav>
+                <span>Connecté : <b>{{ session['username'] }}</b></span>
+                <a href="{{ url_for('dashboard') }}">Ma Cave</a>
+                <a href="{{ url_for('catalogue') }}">Catalogue</a>
+                <a href="{{ url_for('logout') }}">Déconnexion</a>
+            </nav>
+        {% endif %}
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

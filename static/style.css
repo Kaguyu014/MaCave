@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+    --wine-dark: #3b1219;
+    --wine-main: #681d2c;
+    --wine-light: #8e2a3e;
+    --wine-bg: #f9f6f0;
+    --card-bg: #ffffff;
+    --text-dark: #231f20;
+    --text-muted: #6e6b6c;
+    --border: #e6e1da;
+    --gold: #c59b27;
+    --radius: 10px;
+    --shadow: 0 4px 12px rgba(59, 18, 25, 0.05);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background-color: var(--wine-bg);
+    color: var(--text-dark);
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    line-height: 1.5;
+}
+
+/* Header */
+header {
+    background-color: var(--wine-dark);
+    color: #fff;
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--gold);
+}
+
+header h2 { color: var(--gold); font-size: 1.4rem; font-weight: 700; }
+header nav a { color: #fff; text-decoration: none; margin-left: 16px; font-weight: 500; }
+header nav a:hover { color: var(--gold); }
+
+/* Layout */
+main { max-width: 1140px; margin: 32px auto; padding: 0 16px; }
+.dashboard-container { display: flex; flex-direction: column; gap: 24px; }
+
+/* Cards Section */
+.section-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+}
+
+.section-card h2 { font-size: 1.25rem; color: var(--wine-dark); margin-bottom: 16px; font-weight: 700; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+
+/* KPIs */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.kpi-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--wine-main);
+}
+.kpi-label { font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; display: block; }
+.kpi-value { font-size: 1.75rem; font-weight: 700; color: var(--wine-dark); margin-top: 4px; }
+
+/* Étagères Pill Tags */
+.shelf-tags { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.shelf-pill {
+    background: var(--wine-bg);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.shelf-info strong { display: block; color: var(--wine-dark); font-size: 0.95rem; }
+.shelf-info small { color: var(--text-muted); font-size: 0.8rem; }
+.btn-icon-danger { background: none; border: none; color: #d9534f; cursor: pointer; font-weight: bold; }
+
+/* Forms & Inputs */
+input, select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+input:focus, select:focus { outline: none; border-color: var(--wine-main); }
+
+.form-inline { display: flex; gap: 12px; max-width: 500px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.form-group label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; color: var(--text-dark); }
+.span-all { grid-column: 1 / -1; }
+
+/* Buttons */
+.btn-primary, .btn-success, .btn-archive {
+    background: var(--wine-main);
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-primary:hover, .btn-success:hover, .btn-archive:hover { background: var(--wine-dark); }
+
+/* Table */
+.table-responsive { overflow-x: auto; }
+.custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+.custom-table th { background: var(--wine-bg); color: var(--wine-dark); padding: 12px 16px; font-weight: 700; border-bottom: 2px solid var(--border); }
+.custom-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.custom-table tr:hover { background-color: #faf8f5; }
+
+.badge-wine { background: #f3e9ec; color: var(--wine-main); padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; }
+.badge-shelf { background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; }
+.price-cell { font-weight: 700; color: var(--wine-dark); }
+
+.archive-inline { display: flex; gap: 8px; }
+.archive-inline input[type="number"] { width: 80px; }
+.archive-inline input[type="text"] { flex: 1; }
+
+.sort-options { font-size: 0.85rem; color: var(--text-muted); }
+.sort-badge { color: var(--wine-main); text-decoration: none; font-weight: 600; margin-left: 6px; }
+.sort-badge:hover { text-decoration: underline; }
+
+/* Catalog Cards */
+.catalog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+.wine-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+.wine-card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.wine-card h3 { color: var(--wine-dark); font-size: 1.1rem; }
+.wine-subtitle { color: var(--text-muted); font-size: 0.85rem; }
+.rating-badge { background: var(--wine-dark); color: var(--gold); padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; }
+.wine-meta { display: flex; gap: 16px; font-size: 0.85rem; margin: 12px 0; padding: 8px 0; border-y: 1px solid var(--border); }
+.reviews-section { margin-top: 16px; }
+.reviews-section h4 { font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+.review-item { background: var(--wine-bg); padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 0.85rem; }
+.review-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.review-score { font-weight: 700; color: var(--wine-main); }
+.review-date { color: var(--text-muted); }
+.review-comment { font-style: italic; color: var(--text-dark); }

@@ -1,0 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Oct 19 08:21:23 2026
+
+@author: user
+"""
+

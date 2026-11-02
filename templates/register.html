@@ -1,0 +1,12 @@
+<!-- register.html -->
+{% extends 'base.html' %}
+{% block content %}
+<h3>Inscription</h3>
+<form method="post">
+    <input type="text" name="username" placeholder="Identifiant" required><br>
+    <input type="email" name="email" placeholder="Adresse e-mail" required><br>
+    <input type="password" name="password" placeholder="Mot de passe" required><br>
+    <button type="submit">Créer mon compte</button>
+</form>
+<p><a href="{{ url_for('login') }}">Déjà un compte ? Se connecter</a></p>
+{% endblock %}

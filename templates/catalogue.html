@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="dashboard-container">
+    <h2>Catalogue Communautaire des Vins</h2>
+
+    <div class="catalog-grid">
+    {% for c in catalogue %}
+        <div class="wine-card">
+            <div class="wine-card-header">
+                <div>
+                    <h3>{{ c.vin.domaine }}</h3>
+                    <p class="wine-subtitle">{{ c.vin.nom_cuvee }} ({{ c.vin.millesime }})</p>
+                </div>
+                <div class="rating-badge">
+                    <span class="rating-val">{{ c.moyenne }}</span>
+                </div>
+            </div>
+            
+            <div class="wine-meta">
+                <span>Type : <strong>{{ c.vin.type_vin }}</strong></span>
+                <span>Région : <strong>{{ c.vin.region }}</strong></span>
+            </div>
+
+            <div class="reviews-section">
+                <h4>Avis de la communauté</h4>
+                <div class="reviews-list">
+                {% for ev in c.evaluations %}
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="review-score">{{ ev.note }}/20</span>
+                            <small class="review-date">{{ ev.date_eval[:10] }}</small>
+                        </div>
+                        {% if ev.commentaire %}
+                            <p class="review-comment">« {{ ev.commentaire }} »</p>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p class="no-reviews">Aucune dégustation enregistrée.</p>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
