@@ -9,8 +9,7 @@
 1. [Présentation du Projet](#-présentation-du-projet)
 2. [Architecture & Technologies](#️-architecture--technologies)
 3. [Modélisation UML](#-modélisation-uml)
-4. [Installation et Démarrage Local](#-installation-et-démarrage-local)
-5. [Perspectives & Évolutions Futures](#-perspectives--évolutions-futures)
+4. [Perspectives & Évolutions Futures](#-perspectives--évolutions-futures)
 
 ---
 
@@ -39,23 +38,23 @@ Le projet suit une architecture modulaire en couches, garantissant un découplag
 
 ## 📊 Modélisation UML
 
-Les fichiers sources modifiables (compatibles avec [draw.io](https://app.diagrams.net/)) ainsi que leurs exports visuels sont disponibles dans le répertoire [`docs/`](docs/)[cite: 2, 3].
+Les fichiers sources modifiables (compatibles avec [draw.io](https://app.diagrams.net/)) ainsi que leurs exports visuels sont disponibles dans le répertoire [`docs/`](docs/).
 
 ### 1. Diagramme de Cas d'Utilisation
 ![Diagramme de Cas d'Utilisation](docs/1_diagramme_cas_utilisation.png)
-*Source éditable : [`docs/1_diagramme_cas_utilisation.drawio`](docs/1_diagramme_cas_utilisation.drawio)*[cite: 2]
+*Source éditable : [`docs/1_diagramme_cas_utilisation.drawio`](docs/1_diagramme_cas_utilisation.drawio)*
 
 ### 2. Diagramme de Classes Métier
 ![Diagramme de Classes](docs/2_diagramme_classes.png)
-*Source éditable : [`docs/2_diagramme_classes.drawio`](docs/2_diagramme_classes.drawio)*[cite: 2]
+*Source éditable : [`docs/2_diagramme_classes.drawio`](docs/2_diagramme_classes.drawio)*
 
 ### 3. Diagramme de Séquence (Archivage & Dégustation)
 ![Diagramme de Séquence](docs/3_diagramme_sequence.png)
-*Source éditable : [`docs/3_diagramme_sequence.drawio`](docs/3_diagramme_sequence.drawio)*[cite: 2]
+*Source éditable : [`docs/3_diagramme_sequence.drawio`](docs/3_diagramme_sequence.drawio)*
 
 ### 4. Diagramme d'Activité (Ajout de bouteilles en stock)
 ![Diagramme d'Activité](docs/4_diagramme_activite.png)
-*Source éditable : [`docs/4_diagramme_activite.drawio`](docs/4_diagramme_activite.drawio)*[cite: 3]
+*Source éditable : [`docs/4_diagramme_activite.drawio`](docs/4_diagramme_activite.drawio)*
 
 ## 🔮 Perspectives & Évolutions Futures
 
