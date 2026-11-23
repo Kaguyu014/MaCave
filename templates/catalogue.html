@@ -3,6 +3,24 @@
 <div class="dashboard-container">
     <h2>Catalogue Communautaire des Vins</h2>
 
+    <!-- Barre de recherche & filtrage -->
+    <section class="section-card" style="margin-bottom: 20px;">
+        <form action="{{ url_for('catalogue') }}" method="get" class="form-inline" style="margin: 0;">
+            <input type="text" name="q" value="{{ recherche }}" placeholder="Rechercher domaine, cuvée, région...">
+            <select name="type_vin">
+                <option value="">Tous les types</option>
+                <option value="Rouge" {% if filtre_type == 'Rouge' %}selected{% endif %}>Rouge</option>
+                <option value="Blanc" {% if filtre_type == 'Blanc' %}selected{% endif %}>Blanc</option>
+                <option value="Rosé" {% if filtre_type == 'Rosé' %}selected{% endif %}>Rosé</option>
+                <option value="Effervescent" {% if filtre_type == 'Effervescent' %}selected{% endif %}>Effervescent</option>
+            </select>
+            <button type="submit" class="btn-primary">Rechercher</button>
+            {% if recherche or filtre_type %}
+                <a href="{{ url_for('catalogue') }}" class="sort-badge">Réinitialiser</a>
+            {% endif %}
+        </form>
+    </section>
+
     <div class="catalog-grid">
     {% for c in catalogue %}
         <div class="wine-card">
@@ -21,17 +39,30 @@
                 <span>Région : <strong>{{ c.vin.region }}</strong></span>
             </div>
 
+            {% if c.vin.description %}
+                <p style="font-size: 0.9rem; color: #555; margin-bottom: 12px;">{{ c.vin.description }}</p>
+            {% endif %}
+
             <div class="reviews-section">
                 <h4>Avis de la communauté</h4>
                 <div class="reviews-list">
                 {% for ev in c.evaluations %}
                     <div class="review-item">
                         <div class="review-header">
-                            <span class="review-score">{{ ev.note }}/20</span>
+                            <span class="review-score">{{ ev.note }}/20 <small style="font-weight: normal;">par {{ ev.username }}</small></span>
                             <small class="review-date">{{ ev.date_eval[:10] }}</small>
                         </div>
                         {% if ev.commentaire %}
                             <p class="review-comment">« {{ ev.commentaire }} »</p>
+                        {% endif %}
+
+                        <!-- Formulaire de modification si l'utilisateur est l'auteur de l'avis -->
+                        {% if ev.user_id == current_user_id %}
+                            <form action="{{ url_for('modifier_evaluation', e_id=ev.id) }}" method="post" class="archive-inline" style="margin-top: 8px;">
+                                <input type="number" step="0.5" min="0" max="20" name="note" value="{{ ev.note }}" style="width: 75px;" required>
+                                <input type="text" name="commentaire" value="{{ ev.commentaire or '' }}" placeholder="Modifier mon avis...">
+                                <button type="submit" class="sort-badge">Modifier</button>
+                            </form>
                         {% endif %}
                     </div>
                 {% else %}

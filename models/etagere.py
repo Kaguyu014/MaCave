@@ -11,6 +11,14 @@ class EtagereMetier:
             place_restante = capacite_max - occupation
             raise EtagereException(f"Dépassement de capacité : {place_restante} place(s) restante(s).")
 
+    # Vérifie que la nouvelle capacité n'est pas inférieure au nombre de bouteilles déjà présentes
+    @staticmethod
+    def verifier_modification_capacite(nouvelle_capacite: int, occupation: int):
+        if nouvelle_capacite <= 0:
+            raise EtagereException("La capacité doit être supérieure à zéro.")
+        if nouvelle_capacite < occupation:
+            raise EtagereException(f"Impossible : l'étagère contient déjà {occupation} bouteille(s).")
+
     # Empêche de supprimer une étagère qui n'est pas vide
     @staticmethod
     def verifier_suppression(occupation: int):

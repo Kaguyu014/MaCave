@@ -9,7 +9,8 @@
 1. [Présentation du Projet](#-présentation-du-projet)
 2. [Architecture & Technologies](#️-architecture--technologies)
 3. [Modélisation UML](#-modélisation-uml)
-4. [Perspectives & Évolutions Futures](#-perspectives--évolutions-futures)
+4. [Installation et Lancement](#-installation-et-lancement)
+5. [Perspectives & Évolutions Futures](#-perspectives--évolutions-futures)
 
 ---
 
@@ -55,6 +56,23 @@ Les fichiers sources modifiables (compatibles avec [draw.io](https://app.diagram
 ### 4. Diagramme d'Activité (Ajout de bouteilles en stock)
 ![Diagramme d'Activité](docs/4_diagramme_activite.png)
 *Source éditable : [`docs/4_diagramme_activite.drawio`](docs/4_diagramme_activite.drawio)*
+
+## 🚀 Installation et Lancement
+
+### 1. Cloner le projet
+    git clone https://github.com/Kaguyu014/MaCave
+    cd macave
+
+### 2. Installer les dépendances
+    pip install -r requirements.txt
+
+### 3. Exécuter les tests automatisés
+    python -m pytest -v tests/test_metier.py
+
+### 4. Démarrer l'application
+    python app.py
+
+Ouvrez ensuite votre navigateur à l'adresse : **http://127.0.0.1:5000**
 
 ## 🔮 Perspectives & Évolutions Futures
 

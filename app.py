@@ -27,7 +27,6 @@ def register():
         pwd = request.form['password']
         db = get_connection()
         try:
-            # Enregistre l'utilisateur avec un mot de passe haché
             db.execute("INSERT INTO user (username, email, password_hash) VALUES (?, ?, ?)",
                        (user, email, generate_password_hash(pwd)))
             db.commit()
@@ -47,7 +46,6 @@ def login():
         db = get_connection()
         u = db.execute("SELECT * FROM user WHERE username = ?", (user,)).fetchone()
         db.close()
-        # Vérifie le mot de passe et ouvre la session
         if u and check_password_hash(u['password_hash'], pwd):
             session['user_id'] = u['id']
             session['username'] = u['username']
@@ -61,7 +59,29 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# Page principale : étagères, statistiques et stock privé
+# Modification du profil utilisateur (email et/ou mot de passe)
+@app.route('/profil', methods=['GET', 'POST'])
+def profil():
+    u_id = session['user_id']
+    db = get_connection()
+    if request.method == 'POST':
+        email = request.form['email'].strip()
+        nouveau_pwd = request.form.get('password', '').strip()
+        try:
+            if nouveau_pwd:
+                db.execute("UPDATE user SET email = ?, password_hash = ? WHERE id = ?",
+                           (email, generate_password_hash(nouveau_pwd), u_id))
+            else:
+                db.execute("UPDATE user SET email = ? WHERE id = ?", (email, u_id))
+            db.commit()
+            flash("Profil mis à jour avec succès.")
+        except Exception:
+            flash("Cet email est déjà utilisé par un autre compte.")
+    u = db.execute("SELECT username, email FROM user WHERE id = ?", (u_id,)).fetchone()
+    db.close()
+    return render_template('profil.html', user=u)
+
+# Page principale : étagères, statistiques, stock filtrable et historique archivé
 @app.route('/')
 def dashboard():
     u_id = session['user_id']
@@ -84,24 +104,47 @@ def dashboard():
     capacite_totale = sum(e['capacite_max'] for e in etageres)
     taux_occ = f"{(total_bouteilles / capacite_totale * 100):.1f}%" if capacite_totale > 0 else "Aucune étagère"
 
-    # Gestion du tri du tableau
+    # Filtres de recherche et tri sur le stock
+    recherche = request.args.get('q', '').strip()
+    filtre_type = request.args.get('type_vin', '').strip()
     tri = request.args.get('tri', 'domaine')
     champ_tri = {'domaine': 'v.domaine', 'prix': 'b.prix_achat', 'millesime': 'v.millesime'}.get(tri, 'v.domaine')
 
-    # Liste des bouteilles en stock de l'utilisateur
-    stock = db.execute(f"""
+    requete_stock = """
         SELECT b.id, b.prix_achat, e.nom as etagere_nom, v.domaine, v.nom_cuvee, v.type_vin, v.millesime, v.region
         FROM bouteille b
         JOIN vin v ON b.vin_id = v.id
         LEFT JOIN etagere e ON b.etagere_id = e.id
         WHERE b.user_id = ? AND b.statut = 'STOCK'
-        ORDER BY {champ_tri} ASC
+    """
+    params = [u_id]
+
+    if recherche:
+        requete_stock += " AND (v.domaine LIKE ? OR v.nom_cuvee LIKE ? OR v.region LIKE ?)"
+        motif = f"%{recherche}%"
+        params.extend([motif, motif, motif])
+    if filtre_type:
+        requete_stock += " AND v.type_vin = ?"
+        params.append(filtre_type)
+
+    requete_stock += f" ORDER BY {champ_tri} ASC"
+    stock = db.execute(requete_stock, params).fetchall()
+
+    # Historique privé des bouteilles dégustées et archivées
+    archives = db.execute("""
+        SELECT b.id, b.date_sortie, b.prix_achat, v.domaine, v.nom_cuvee, v.millesime, ev.note, ev.commentaire
+        FROM bouteille b
+        JOIN vin v ON b.vin_id = v.id
+        LEFT JOIN evaluation ev ON ev.bouteille_id = b.id
+        WHERE b.user_id = ? AND b.statut = 'ARCHIVEE'
+        ORDER BY b.date_sortie DESC
     """, (u_id,)).fetchall()
     
     db.close()
-    return render_template('dashboard.html', etageres=etageres, stock=stock, 
+    return render_template('dashboard.html', etageres=etageres, stock=stock, archives=archives,
                            total_b=total_bouteilles, total_r=total_refs, 
-                           valeur=valeur_stock, taux=taux_occ)
+                           valeur=valeur_stock, taux=taux_occ,
+                           recherche=recherche, filtre_type=filtre_type)
 
 # Création d'une étagère
 @app.route('/etagere/creer', methods=['POST'])
@@ -121,6 +164,27 @@ def creer_etagere():
         db.close()
     return redirect(url_for('dashboard'))
 
+# Modification du nom et de la capacité d'une étagère
+@app.route('/etagere/modifier/<int:id>', methods=['POST'])
+def modifier_etagere(id):
+    nom = request.form['nom'].strip()
+    nouv_cap = int(request.form['capacite_max'])
+    db = get_connection()
+    try:
+        et = db.execute("SELECT id FROM etagere WHERE id = ? AND user_id = ?", (id, session['user_id'])).fetchone()
+        if not et:
+            raise EtagereException("Étagère non trouvée.")
+        occ = db.execute("SELECT COUNT(*) FROM bouteille WHERE etagere_id = ? AND statut = 'STOCK'", (id,)).fetchone()[0]
+        EtagereMetier.verifier_modification_capacite(nouv_cap, occ)
+        db.execute("UPDATE etagere SET nom = ?, capacite_max = ? WHERE id = ?", (nom, nouv_cap, id))
+        db.commit()
+        flash("Étagère mise à jour.")
+    except Exception as e:
+        flash(str(e))
+    finally:
+        db.close()
+    return redirect(url_for('dashboard'))
+
 # Suppression d'une étagère vide
 @app.route('/etagere/supprimer/<int:id>', methods=['POST'])
 def supprimer_etagere(id):
@@ -129,7 +193,6 @@ def supprimer_etagere(id):
         et = db.execute("SELECT id FROM etagere WHERE id = ? AND user_id = ?", (id, session['user_id'])).fetchone()
         if not et:
             raise EtagereException("Étagère non trouvée.")
-        # Vérifie qu'elle ne contient aucune bouteille avant de supprimer
         occ = db.execute("SELECT COUNT(*) FROM bouteille WHERE etagere_id = ? AND statut = 'STOCK'", (id,)).fetchone()[0]
         EtagereMetier.verifier_suppression(occ)
         db.execute("DELETE FROM etagere WHERE id = ?", (id,))
@@ -152,30 +215,28 @@ def ajouter_bouteilles():
     t_vin = request.form['type_vin']
     mill = int(request.form['millesime'])
     reg = request.form['region'].strip()
+    desc = request.form.get('description', '').strip()
 
     db = get_connection()
     try:
-        # Vérifie que l'étagère existe et a assez de place
         et = db.execute("SELECT capacite_max FROM etagere WHERE id = ? AND user_id = ?", (et_id, u_id)).fetchone()
         if not et:
             raise EtagereException("Étagère invalide.")
         occ = db.execute("SELECT COUNT(*) FROM bouteille WHERE etagere_id = ? AND statut = 'STOCK'", (et_id,)).fetchone()[0]
         EtagereMetier.verifier_capacite_suffisante(et['capacite_max'], occ, qte)
 
-        # Crée ou récupère la référence du vin (sans doublon)
         cle = VinMetier.generer_cle(dom, cuv, t_vin, mill, reg)
         db.execute("BEGIN TRANSACTION")
         vin = db.execute("SELECT id FROM vin WHERE cle_unicite = ?", (cle,)).fetchone()
         if not vin:
             cur = db.execute("""
-                INSERT INTO vin (domaine, nom_cuvee, type_vin, millesime, region, cle_unicite)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (dom, cuv, t_vin, mill, reg, cle))
+                INSERT INTO vin (domaine, nom_cuvee, type_vin, millesime, region, description, cle_unicite)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (dom, cuv, t_vin, mill, reg, desc, cle))
             vin_id = cur.lastrowid
         else:
             vin_id = vin['id']
 
-        # Ajoute chaque exemplaire physique en stock
         maintenant = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         for _ in range(qte):
             db.execute("""
@@ -185,7 +246,7 @@ def ajouter_bouteilles():
         db.commit()
         flash(f"{qte} bouteille(s) ajoutée(s).")
     except Exception as e:
-        db.execute("ROLLBACK")  # Annule tout en cas d'erreur
+        db.execute("ROLLBACK")
         flash(f"Échec de l'ajout : {e}")
     finally:
         db.close()
@@ -204,7 +265,6 @@ def deplacer_bouteille(b_id):
         dest = db.execute("SELECT capacite_max FROM etagere WHERE id = ? AND user_id = ?", (nouv_et_id, u_id)).fetchone()
         if not dest:
             raise EtagereException("Étagère cible introuvable.")
-        # Vérifie qu'il reste au moins 1 place sur l'étagère d'arrivée
         occ = db.execute("SELECT COUNT(*) FROM bouteille WHERE etagere_id = ? AND statut = 'STOCK'", (nouv_et_id,)).fetchone()[0]
         EtagereMetier.verifier_capacite_suffisante(dest['capacite_max'], occ, 1)
 
@@ -213,6 +273,24 @@ def deplacer_bouteille(b_id):
         flash("Bouteille déplacée avec succès.")
     except Exception as e:
         db.rollback()
+        flash(str(e))
+    finally:
+        db.close()
+    return redirect(url_for('dashboard'))
+
+# Suppression simple d'une bouteille en stock (erreur de saisie ou casse)
+@app.route('/bouteille/supprimer/<int:b_id>', methods=['POST'])
+def supprimer_bouteille(b_id):
+    u_id = session['user_id']
+    db = get_connection()
+    try:
+        b = db.execute("SELECT id FROM bouteille WHERE id = ? AND user_id = ? AND statut = 'STOCK'", (b_id, u_id)).fetchone()
+        if not b:
+            raise BouteilleException("Bouteille introuvable ou déjà archivée.")
+        db.execute("DELETE FROM bouteille WHERE id = ?", (b_id,))
+        db.commit()
+        flash("Bouteille supprimée du stock.")
+    except Exception as e:
         flash(str(e))
     finally:
         db.close()
@@ -230,10 +308,8 @@ def archiver_bouteille(b_id):
         b = db.execute("SELECT * FROM bouteille WHERE id = ? AND user_id = ?", (b_id, u_id)).fetchone()
         if not b:
             raise BouteilleException("Bouteille non trouvée.")
-        # Vérifie que la bouteille est en stock et la note entre 0 et 20
         BouteilleMetier.valider_archivage(b['statut'], note)
 
-        # Retire la bouteille de l'étagère et enregistre l'avis
         maintenant = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         db.execute("BEGIN TRANSACTION")
         db.execute("UPDATE bouteille SET statut = 'ARCHIVEE', etagere_id = NULL, date_sortie = ? WHERE id = ?", (maintenant, b_id))
@@ -250,14 +326,57 @@ def archiver_bouteille(b_id):
         db.close()
     return redirect(url_for('dashboard'))
 
+# Modification d'une évaluation existante par son auteur
+@app.route('/evaluation/modifier/<int:e_id>', methods=['POST'])
+def modifier_evaluation(e_id):
+    u_id = session['user_id']
+    nouv_note = float(request.form['note'])
+    nouv_comm = request.form.get('commentaire', '').strip()
+    db = get_connection()
+    try:
+        ev = db.execute("SELECT id FROM evaluation WHERE id = ? AND user_id = ?", (e_id, u_id)).fetchone()
+        if not ev:
+            raise BouteilleException("Évaluation introuvable ou non autorisée.")
+        BouteilleMetier.valider_note(nouv_note)
+        db.execute("UPDATE evaluation SET note = ?, commentaire = ? WHERE id = ?", (nouv_note, nouv_comm, e_id))
+        db.commit()
+        flash("Évaluation mise à jour.")
+    except Exception as e:
+        flash(str(e))
+    finally:
+        db.close()
+    return redirect(url_for('catalogue'))
+
 # Page du catalogue partagé et des avis de la communauté
 @app.route('/catalogue')
 def catalogue():
+    recherche = request.args.get('q', '').strip()
+    filtre_type = request.args.get('type_vin', '').strip()
+
     db = get_connection()
-    vins = db.execute("SELECT * FROM vin ORDER BY domaine ASC").fetchall()
+    requete_vins = "SELECT * FROM vin WHERE 1=1"
+    params = []
+
+    if recherche:
+        requete_vins += " AND (domaine LIKE ? OR nom_cuvee LIKE ? OR region LIKE ?)"
+        motif = f"%{recherche}%"
+        params.extend([motif, motif, motif])
+    if filtre_type:
+        requete_vins += " AND type_vin = ?"
+        params.append(filtre_type)
+
+    requete_vins += " ORDER BY domaine ASC"
+    vins = db.execute(requete_vins, params).fetchall()
+
     donnees = []
     for v in vins:
-        evals = db.execute("SELECT note, commentaire, date_eval FROM evaluation WHERE vin_id = ?", (v['id'],)).fetchall()
+        evals = db.execute("""
+            SELECT ev.id, ev.user_id, ev.note, ev.commentaire, ev.date_eval, u.username
+            FROM evaluation ev
+            JOIN user u ON ev.user_id = u.id
+            WHERE ev.vin_id = ?
+            ORDER BY ev.date_eval DESC
+        """, (v['id'],)).fetchall()
         notes = [e['note'] for e in evals]
         donnees.append({
             'vin': v,
@@ -265,10 +384,11 @@ def catalogue():
             'evaluations': evals
         })
     db.close()
-    return render_template('catalogue.html', catalogue=donnees)
+    return render_template('catalogue.html', catalogue=donnees,
+                           recherche=recherche, filtre_type=filtre_type,
+                           current_user_id=session['user_id'])
 
-# Lancement du serveur local
 if __name__ == '__main__':
     if not os.path.exists("macave.db"):
-        init_db()  # Crée la base au premier démarrage
+        init_db()
     app.run(debug=True, port=5000)
