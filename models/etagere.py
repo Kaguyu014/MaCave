@@ -2,6 +2,7 @@ class EtagereException(Exception):
     pass
 
 class EtagereMetier:
+    # Vérifie qu'il reste assez de place sur l'étagère avant d'ajouter des bouteilles
     @staticmethod
     def verifier_capacite_suffisante(capacite_max: int, occupation: int, quantite_voulue: int):
         if quantite_voulue <= 0:
@@ -10,6 +11,7 @@ class EtagereMetier:
             place_restante = capacite_max - occupation
             raise EtagereException(f"Dépassement de capacité : {place_restante} place(s) restante(s).")
 
+    # Empêche de supprimer une étagère qui n'est pas vide
     @staticmethod
     def verifier_suppression(occupation: int):
         if occupation > 0:

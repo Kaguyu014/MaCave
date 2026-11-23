@@ -9,14 +9,16 @@ from models.etagere import EtagereMetier, EtagereException
 from models.bouteille import BouteilleMetier, BouteilleException
 
 app = Flask(__name__)
-app.secret_key = "cle_secrete_tp_macave"
+app.secret_key = "cle_secrete_tp_macave"  # Clé pour sécuriser les sessions
 
+# Redirige vers la connexion si l'utilisateur n'est pas connecté
 @app.before_request
 def verifier_session():
     routes_libres = ['login', 'register', 'static']
     if request.endpoint and request.endpoint not in routes_libres and 'user_id' not in session:
         return redirect(url_for('login'))
 
+# Création d'un compte utilisateur
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -25,6 +27,7 @@ def register():
         pwd = request.form['password']
         db = get_connection()
         try:
+            # Enregistre l'utilisateur avec un mot de passe haché
             db.execute("INSERT INTO user (username, email, password_hash) VALUES (?, ?, ?)",
                        (user, email, generate_password_hash(pwd)))
             db.commit()
@@ -35,6 +38,7 @@ def register():
             db.close()
     return render_template('register.html')
 
+# Connexion à l'application
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -43,6 +47,7 @@ def login():
         db = get_connection()
         u = db.execute("SELECT * FROM user WHERE username = ?", (user,)).fetchone()
         db.close()
+        # Vérifie le mot de passe et ouvre la session
         if u and check_password_hash(u['password_hash'], pwd):
             session['user_id'] = u['id']
             session['username'] = u['username']
@@ -50,16 +55,19 @@ def login():
         flash("Identifiants incorrects.")
     return render_template('login.html')
 
+# Déconnexion
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
 
+# Page principale : étagères, statistiques et stock privé
 @app.route('/')
 def dashboard():
     u_id = session['user_id']
     db = get_connection()
     
+    # Récupère les étagères et compte les bouteilles dessus
     etageres = db.execute("""
         SELECT e.*, COUNT(b.id) as occupation 
         FROM etagere e 
@@ -68,6 +76,7 @@ def dashboard():
         GROUP BY e.id
     """, (u_id,)).fetchall()
     
+    # Calcul des statistiques du tableau de bord
     total_bouteilles = db.execute("SELECT COUNT(*) FROM bouteille WHERE user_id = ? AND statut = 'STOCK'", (u_id,)).fetchone()[0]
     total_refs = db.execute("SELECT COUNT(DISTINCT vin_id) FROM bouteille WHERE user_id = ? AND statut = 'STOCK'", (u_id,)).fetchone()[0]
     valeur_stock = db.execute("SELECT COALESCE(SUM(prix_achat), 0) FROM bouteille WHERE user_id = ? AND statut = 'STOCK'", (u_id,)).fetchone()[0]
@@ -75,9 +84,11 @@ def dashboard():
     capacite_totale = sum(e['capacite_max'] for e in etageres)
     taux_occ = f"{(total_bouteilles / capacite_totale * 100):.1f}%" if capacite_totale > 0 else "Aucune étagère"
 
+    # Gestion du tri du tableau
     tri = request.args.get('tri', 'domaine')
     champ_tri = {'domaine': 'v.domaine', 'prix': 'b.prix_achat', 'millesime': 'v.millesime'}.get(tri, 'v.domaine')
 
+    # Liste des bouteilles en stock de l'utilisateur
     stock = db.execute(f"""
         SELECT b.id, b.prix_achat, e.nom as etagere_nom, v.domaine, v.nom_cuvee, v.type_vin, v.millesime, v.region
         FROM bouteille b
@@ -92,6 +103,7 @@ def dashboard():
                            total_b=total_bouteilles, total_r=total_refs, 
                            valeur=valeur_stock, taux=taux_occ)
 
+# Création d'une étagère
 @app.route('/etagere/creer', methods=['POST'])
 def creer_etagere():
     nom = request.form['nom'].strip()
@@ -109,6 +121,7 @@ def creer_etagere():
         db.close()
     return redirect(url_for('dashboard'))
 
+# Suppression d'une étagère vide
 @app.route('/etagere/supprimer/<int:id>', methods=['POST'])
 def supprimer_etagere(id):
     db = get_connection()
@@ -116,6 +129,7 @@ def supprimer_etagere(id):
         et = db.execute("SELECT id FROM etagere WHERE id = ? AND user_id = ?", (id, session['user_id'])).fetchone()
         if not et:
             raise EtagereException("Étagère non trouvée.")
+        # Vérifie qu'elle ne contient aucune bouteille avant de supprimer
         occ = db.execute("SELECT COUNT(*) FROM bouteille WHERE etagere_id = ? AND statut = 'STOCK'", (id,)).fetchone()[0]
         EtagereMetier.verifier_suppression(occ)
         db.execute("DELETE FROM etagere WHERE id = ?", (id,))
@@ -126,6 +140,7 @@ def supprimer_etagere(id):
         db.close()
     return redirect(url_for('dashboard'))
 
+# Ajout d'une ou plusieurs bouteilles dans le stock
 @app.route('/bouteilles/ajouter', methods=['POST'])
 def ajouter_bouteilles():
     u_id = session['user_id']
@@ -140,12 +155,14 @@ def ajouter_bouteilles():
 
     db = get_connection()
     try:
+        # Vérifie que l'étagère existe et a assez de place
         et = db.execute("SELECT capacite_max FROM etagere WHERE id = ? AND user_id = ?", (et_id, u_id)).fetchone()
         if not et:
             raise EtagereException("Étagère invalide.")
         occ = db.execute("SELECT COUNT(*) FROM bouteille WHERE etagere_id = ? AND statut = 'STOCK'", (et_id,)).fetchone()[0]
         EtagereMetier.verifier_capacite_suffisante(et['capacite_max'], occ, qte)
 
+        # Crée ou récupère la référence du vin (sans doublon)
         cle = VinMetier.generer_cle(dom, cuv, t_vin, mill, reg)
         db.execute("BEGIN TRANSACTION")
         vin = db.execute("SELECT id FROM vin WHERE cle_unicite = ?", (cle,)).fetchone()
@@ -158,6 +175,7 @@ def ajouter_bouteilles():
         else:
             vin_id = vin['id']
 
+        # Ajoute chaque exemplaire physique en stock
         maintenant = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         for _ in range(qte):
             db.execute("""
@@ -167,12 +185,13 @@ def ajouter_bouteilles():
         db.commit()
         flash(f"{qte} bouteille(s) ajoutée(s).")
     except Exception as e:
-        db.execute("ROLLBACK")
+        db.execute("ROLLBACK")  # Annule tout en cas d'erreur
         flash(f"Échec de l'ajout : {e}")
     finally:
         db.close()
     return redirect(url_for('dashboard'))
 
+# Déplacement d'une bouteille vers une autre étagère
 @app.route('/bouteille/deplacer/<int:b_id>', methods=['POST'])
 def deplacer_bouteille(b_id):
     nouv_et_id = int(request.form['nouvelle_etagere_id'])
@@ -185,6 +204,7 @@ def deplacer_bouteille(b_id):
         dest = db.execute("SELECT capacite_max FROM etagere WHERE id = ? AND user_id = ?", (nouv_et_id, u_id)).fetchone()
         if not dest:
             raise EtagereException("Étagère cible introuvable.")
+        # Vérifie qu'il reste au moins 1 place sur l'étagère d'arrivée
         occ = db.execute("SELECT COUNT(*) FROM bouteille WHERE etagere_id = ? AND statut = 'STOCK'", (nouv_et_id,)).fetchone()[0]
         EtagereMetier.verifier_capacite_suffisante(dest['capacite_max'], occ, 1)
 
@@ -198,6 +218,7 @@ def deplacer_bouteille(b_id):
         db.close()
     return redirect(url_for('dashboard'))
 
+# Archivage d'une bouteille après dégustation + ajout d'une note
 @app.route('/bouteille/archiver/<int:b_id>', methods=['POST'])
 def archiver_bouteille(b_id):
     u_id = session['user_id']
@@ -209,8 +230,10 @@ def archiver_bouteille(b_id):
         b = db.execute("SELECT * FROM bouteille WHERE id = ? AND user_id = ?", (b_id, u_id)).fetchone()
         if not b:
             raise BouteilleException("Bouteille non trouvée.")
+        # Vérifie que la bouteille est en stock et la note entre 0 et 20
         BouteilleMetier.valider_archivage(b['statut'], note)
 
+        # Retire la bouteille de l'étagère et enregistre l'avis
         maintenant = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         db.execute("BEGIN TRANSACTION")
         db.execute("UPDATE bouteille SET statut = 'ARCHIVEE', etagere_id = NULL, date_sortie = ? WHERE id = ?", (maintenant, b_id))
@@ -227,6 +250,7 @@ def archiver_bouteille(b_id):
         db.close()
     return redirect(url_for('dashboard'))
 
+# Page du catalogue partagé et des avis de la communauté
 @app.route('/catalogue')
 def catalogue():
     db = get_connection()
@@ -243,7 +267,8 @@ def catalogue():
     db.close()
     return render_template('catalogue.html', catalogue=donnees)
 
+# Lancement du serveur local
 if __name__ == '__main__':
     if not os.path.exists("macave.db"):
-        init_db()
+        init_db()  # Crée la base au premier démarrage
     app.run(debug=True, port=5000)

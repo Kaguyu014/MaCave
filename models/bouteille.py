@@ -2,6 +2,7 @@ class BouteilleException(Exception):
     pass
 
 class BouteilleMetier:
+    # Vérifie qu'une bouteille est bien en stock et que sa note est entre 0 et 20
     @staticmethod
     def valider_archivage(statut: str, note: float):
         if statut != "STOCK":
