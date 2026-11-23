@@ -4,6 +4,16 @@
 
 ---
 
+## 📑 Sommaire
+
+1. [Présentation du Projet](#-présentation-du-projet)
+2. [Architecture & Technologies](#️-architecture--technologies)
+3. [Modélisation UML](#-modélisation-uml)
+4. [Installation et Démarrage Local](#-installation-et-démarrage-local)
+5. [Perspectives & Évolutions Futures](#-perspectives--évolutions-futures)
+
+---
+
 ## 📌 Présentation du Projet
 
 L'application résout la problématique de la gestion physique et qualitative du vin au quotidien en proposant une séparation stricte entre **l'espace privé** (stock, emplacements, prix d'achat) et **l'espace communautaire** (catalogue partagé, notes et commentaires).
@@ -16,7 +26,25 @@ L'application résout la problématique de la gestion physique et qualitative du
 - 🍷 **Dégustation & Archivage :** Lorsqu'une bouteille est dégustée, elle quitte l'étagère pour intégrer l'historique privé avec une note sur 20 et un commentaire facultatif.
 - ⭐ **Moyenne communautaire dynamique :** Le catalogue calcule à la volée la note globale de chaque référence. Si aucune évaluation n'est encore enregistrée, la mention *« Non évalué »* est affichée.
 
----
+## 📊 Modélisation UML
+
+Les fichiers sources modifiables (compatibles avec [draw.io](https://app.diagrams.net/)) ainsi que leurs exports visuels sont disponibles dans le répertoire [`docs/`](docs/)[cite: 2, 3].
+
+### 1. Diagramme de Cas d'Utilisation
+![Diagramme de Cas d'Utilisation](docs/1_diagramme_cas_utilisation.png)
+*Source éditable : [`docs/1_diagramme_cas_utilisation.drawio`](docs/1_diagramme_cas_utilisation.drawio)*[cite: 2]
+
+### 2. Diagramme de Classes Métier
+![Diagramme de Classes](docs/2_diagramme_classes.png)
+*Source éditable : [`docs/2_diagramme_classes.drawio`](docs/2_diagramme_classes.drawio)*[cite: 2]
+
+### 3. Diagramme de Séquence (Archivage & Dégustation)
+![Diagramme de Séquence](docs/3_diagramme_sequence.png)
+*Source éditable : [`docs/3_diagramme_sequence.drawio`](docs/3_diagramme_sequence.drawio)*[cite: 2]
+
+### 4. Diagramme d'Activité (Ajout de bouteilles en stock)
+![Diagramme d'Activité](docs/4_diagramme_activite.png)
+*Source éditable : [`docs/4_diagramme_activite.drawio`](docs/4_diagramme_activite.drawio)*[cite: 3]
 
 ## 🛠️ Architecture & Technologies
 
@@ -42,9 +70,6 @@ macave/
 ├── templates/              # Vues Jinja2 (base, dashboard, catalogue, etc.)
 ├── static/                 # Fichier de style (style.css)
 ├── tests/                  # Tests automatisés (pytest)
-├── docs/                   # Sources UML éditables (.drawio)
-│   ├── 1_diagramme_cas_utilisation.drawio
-│   ├── 2_diagramme_classes.drawio
-│   └── 3_diagramme_sequence.drawio
+├── docs/                   # Diagrammes UML (sources .drawio & exports .png)
 ├── requirements.txt
 └── README.md
