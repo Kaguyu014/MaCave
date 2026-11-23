@@ -1,0 +1,56 @@
+<mxfile host="app.diagrams.net" modified="2026-11-23T08:00:00.000Z" agent="Mozilla/5.0" version="21.0.0" type="device">
+  <diagram id="MaCaveUML" name="2 - Diagramme de Classes">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Utilisateur -->
+        <mxCell id="c_user" value="Utilisateur&#xa;--&#xa;- id : int&#xa;- username : str&#xa;- email : str&#xa;- password_hash : str&#xa;--&#xa;+ check_password(pwd: str) : bool&#xa;+ modifier_profil(email: str) : void" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;html=1;whiteSpace=wrap;fillColor=#f9f6f0;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="230" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- Cave -->
+        <mxCell id="c_cave" value="Cave&#xa;--&#xa;- id : int&#xa;- user_id : int&#xa;--&#xa;+ get_capacite_totale() : int&#xa;+ get_occupation_totale() : int&#xa;+ get_taux_occupation() : float&#xa;+ get_valeur_stock() : float" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;html=1;whiteSpace=wrap;fillColor=#f9f6f0;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="390" y="60" width="230" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- Etagere -->
+        <mxCell id="c_etagere" value="Etagere&#xa;--&#xa;- id : int&#xa;- nom : str&#xa;- capacite_max : int&#xa;--&#xa;+ get_occupation() : int&#xa;+ verifier_capacite_suffisante(nb: int) : void&#xa;+ verifier_suppression() : void" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;html=1;whiteSpace=wrap;fillColor=#f9f6f0;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="380" y="290" width="250" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- Bouteille -->
+        <mxCell id="c_bouteille" value="Bouteille (Exemplaire)&#xa;--&#xa;- id : int&#xa;- prix_achat : float&#xa;- date_ajout : datetime&#xa;- date_sortie : datetime&#xa;- statut : str&#xa;--&#xa;+ deplacer(dest: Etagere) : void&#xa;+ valider_archivage(note: float) : void" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;html=1;whiteSpace=wrap;fillColor=#f9f6f0;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="380" y="530" width="250" height="170" as="geometry" />
+        </mxCell>
+
+        <!-- Vin -->
+        <mxCell id="c_vin" value="Vin (Référence Catalogue)&#xa;--&#xa;- id : int&#xa;- domaine : str&#xa;- nom_cuvee : str&#xa;- type_vin : str&#xa;- millesime : int&#xa;- region : str&#xa;- description : str&#xa;- photo_etiquette : str&#xa;- cle_unicite : str&#xa;--&#xa;+ generer_cle() : str&#xa;+ calculer_note_moyenne() : str" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;html=1;whiteSpace=wrap;fillColor=#f3e5ab;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="790" y="510" width="240" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- Evaluation -->
+        <mxCell id="c_evaluation" value="Evaluation&#xa;--&#xa;- id : int&#xa;- note : float&#xa;- commentaire : str&#xa;- date_eval : datetime&#xa;--&#xa;+ modifier(note: float, avis: str) : void" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;html=1;whiteSpace=wrap;fillColor=#f3e5ab;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="40" y="540" width="220" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- Relations -->
+        <mxCell id="r1" value="possède (1..1)" style="endArrow=diamond;endFill=1;endSize=14;html=1;" edge="1" parent="1" source="c_user" target="c_cave"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r2" value="contient (1..*)" style="endArrow=diamond;endFill=1;endSize=14;html=1;" edge="1" parent="1" source="c_cave" target="c_etagere"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r3" value="stocke (0..1 / 0..*)" style="endArrow=diamond;endFill=0;endSize=14;html=1;" edge="1" parent="1" source="c_etagere" target="c_bouteille"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r4" value="référence (0..* / 1)" style="endArrow=open;endSize=12;html=1;" edge="1" parent="1" source="c_bouteille" target="c_vin"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r5" value="évaluée par (1 / 0..1)" style="endArrow=none;html=1;" edge="1" parent="1" source="c_bouteille" target="c_evaluation"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r6" value="rédige (1 / 0..*)" style="endArrow=none;html=1;" edge="1" parent="1" source="c_user" target="c_evaluation"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r7" value="concerne (1 / 0..*)" style="endArrow=none;html=1;" edge="1" parent="1" source="c_vin" target="c_evaluation">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="910" y="770" />
+              <mxPoint x="150" y="770" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

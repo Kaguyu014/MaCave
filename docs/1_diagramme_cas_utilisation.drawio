@@ -1,0 +1,67 @@
+<mxfile host="app.diagrams.net" modified="2026-11-23T08:00:00.000Z" agent="Mozilla/5.0" version="21.0.0" type="device">
+  <diagram id="UC_MaCave" name="1 - Diagramme de Cas d'Utilisation">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ACTEURS -->
+        <mxCell id="act_visiteur" value="Visiteur" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="130" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="act_user" value="Utilisateur Authentifié&#xa;(Amateur de vin)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="420" width="40" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- SYSTEME -->
+        <mxCell id="sys_box" value="Application Web MaCave" style="shape=rect;html=1;verticalAlign=top;fontStyle=1;whiteSpace=wrap;align=center;fillColor=none;strokeColor=#581825;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="200" y="40" width="760" height="740" as="geometry" />
+        </mxCell>
+
+        <!-- CAS D'UTILISATION -->
+        <mxCell id="uc_register" value="Créer un compte" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f9f6f0;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="260" y="80" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_login" value="Se connecter / Se déconnecter" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f9f6f0;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="260" y="160" width="190" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_profil" value="Modifier son profil" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f9f6f0;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="260" y="240" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_etagere" value="Gérer ses étagères&#xa;(Créer, modifier, supprimer)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f9f6f0;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="260" y="320" width="210" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_dash" value="Consulter le tableau de bord&#xa;&amp; son stock privé (Recherche/Tri)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f9f6f0;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="260" y="405" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_add" value="Ajouter des bouteilles&#xa;(Créer ou lier référence Vin)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f9f6f0;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="260" y="490" width="210" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_move" value="Déplacer ou retirer&#xa;une bouteille du stock" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f9f6f0;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="260" y="575" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_archive" value="Archiver une bouteille&#xa;après dégustation" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f9f6f0;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="260" y="660" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_eval" value="Noter (0-20) &amp; commenter&#xa;le vin dégusté" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f3e5ab;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="620" y="660" width="210" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_catalog" value="Consulter le catalogue&#xa;&amp; les avis communautaires" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f9f6f0;strokeColor=#581825;" vertex="1" parent="1">
+          <mxGeometry x="620" y="405" width="210" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- LIENS -->
+        <mxCell id="l1" style="endArrow=none;html=1;" edge="1" parent="1" source="act_visiteur" target="uc_register"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l2" style="endArrow=none;html=1;" edge="1" parent="1" source="act_visiteur" target="uc_login"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l3" style="endArrow=none;html=1;" edge="1" parent="1" source="act_user" target="uc_profil"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l4" style="endArrow=none;html=1;" edge="1" parent="1" source="act_user" target="uc_etagere"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l5" style="endArrow=none;html=1;" edge="1" parent="1" source="act_user" target="uc_dash"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l6" style="endArrow=none;html=1;" edge="1" parent="1" source="act_user" target="uc_add"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l7" style="endArrow=none;html=1;" edge="1" parent="1" source="act_user" target="uc_move"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l8" style="endArrow=none;html=1;" edge="1" parent="1" source="act_user" target="uc_archive"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l9" style="endArrow=none;html=1;" edge="1" parent="1" source="act_user" target="uc_catalog"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rel_inc" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;dashed=1;html=1;" edge="1" parent="1" source="uc_archive" target="uc_eval"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
