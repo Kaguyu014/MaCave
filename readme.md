@@ -26,6 +26,17 @@ L'application résout la problématique de la gestion physique et qualitative du
 - 🍷 **Dégustation & Archivage :** Lorsqu'une bouteille est dégustée, elle quitte l'étagère pour intégrer l'historique privé avec une note sur 20 et un commentaire facultatif.
 - ⭐ **Moyenne communautaire dynamique :** Le catalogue calcule à la volée la note globale de chaque référence. Si aucune évaluation n'est encore enregistrée, la mention *« Non évalué »* est affichée.
 
+
+## 🛠️ Architecture & Technologies
+
+Le projet suit une architecture modulaire en couches, garantissant un découplage total entre l'interface HTTP et la logique métier.
+
+- **Langage & Framework Web :** Python 3, Flask
+- **Moteur de Template & Design :** Jinja2, HTML5 / CSS3 (Thème personnalisé *Bordeaux & Chêne*)
+- **Base de Données :** SQLite avec gestion des clés étrangères (`PRAGMA foreign_keys = ON;`) et contraintes d'intégrité
+- **Validation & Sécurité :** Hachage des mots de passe (`Werkzeug`), contrôles d'accès côté serveur
+- **Tests unitaires :** `pytest`
+
 ## 📊 Modélisation UML
 
 Les fichiers sources modifiables (compatibles avec [draw.io](https://app.diagrams.net/)) ainsi que leurs exports visuels sont disponibles dans le répertoire [`docs/`](docs/)[cite: 2, 3].
@@ -46,15 +57,14 @@ Les fichiers sources modifiables (compatibles avec [draw.io](https://app.diagram
 ![Diagramme d'Activité](docs/4_diagramme_activite.png)
 *Source éditable : [`docs/4_diagramme_activite.drawio`](docs/4_diagramme_activite.drawio)*[cite: 3]
 
-## 🛠️ Architecture & Technologies
+## 🔮 Perspectives & Évolutions Futures
 
-Le projet suit une architecture modulaire en couches, garantissant un découplage total entre l'interface HTTP et la logique métier.
-
-- **Langage & Framework Web :** Python 3, Flask
-- **Moteur de Template & Design :** Jinja2, HTML5 / CSS3 (Thème personnalisé *Bordeaux & Chêne*)
-- **Base de Données :** SQLite avec gestion des clés étrangères (`PRAGMA foreign_keys = ON;`) et contraintes d'intégrité
-- **Validation & Sécurité :** Hachage des mots de passe (`Werkzeug`), contrôles d'accès côté serveur
-- **Tests unitaires :** `pytest`
+- **Reconnaissance d'étiquettes (OCR & Vision) :** Ajout automatique d'une bouteille par photo de son étiquette.
+- **Alertes d'apogée & Garde :** Notifications sur le tableau de bord lorsqu'une bouteille atteint sa maturité idéale.
+- **Moteur d'accords mets-vins :** Suggestions puisées directement dans le stock disponible selon le plat envisagé.
+- **Tableau de bord analytique avancé :** Graphiques de répartition du stock (région, couleur, millésime) et évolution de la valeur de la cave.
+- **Export & Sauvegarde :** Exportation de l'inventaire et de l'historique des dégustations aux formats CSV ou PDF.
+- **API REST & Application Mobile :** Consultation et gestion rapide de la cave depuis un smartphone devant les étagères.
 
 ### Structure du dépôt
 
